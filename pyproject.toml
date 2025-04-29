@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "recomb_img_sim"
+version = "1.0.0"
+dependencies = ["numpy", "pillow"]
+requires-python = ">=3.10"
+
+[project.scripts]
+imgsim = "recomb_img_sim.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]

@@ -1,0 +1,17 @@
+{
+    "output_dir": "output/",
+    "n_images_per_class": 50,
+    "bin_length": 64,
+    "read_depth": 64,
+    "error_rate": 0,
+    "read_depth_mean": 50,
+    "read_depth_stdev": 0,
+    "read_length_mean": 50,
+    "read_length_stdev": 0,
+    "backcross_parent": "p1",
+    "colors": {
+        "p1": [0, 0, 0],
+        "p2": [255, 255, 255],
+        "missing_data": [0, 255, 0]
+    }
+}
