@@ -88,7 +88,6 @@ def main():
             len(config["colors"]["p1"]),
         )
         final_imgs = img_sim(empty_imgs, img_cls, config)
-        print("Outputting final images...")
         final_imgs = np.moveaxis(final_imgs, 1, 2)
         final_imgs = final_imgs.astype(np.uint8)
         for img in range(config["n_images_per_class"]):
@@ -98,6 +97,7 @@ def main():
                     output_dir, img_cls_name, f"{img_cls_name}_{img}.png"
                 )
             )
+        print("Done!")
 
 
 if __name__ == "__main__":

@@ -102,9 +102,7 @@ def make_cos(imgs: np.ndarray, colors: dict, co_type: str) -> np.ndarray:
         ValueError: if co_type is not p1, p2 or reciprocal.
         (will add a JSON schema to check this at some point)
     """
-    print("Getting crossover locations...")
     co_locations = get_breakpoint_locations(*imgs.shape[:-1])
-    print("Determining which reads contain crossovers...")
     co_reads = mask_event_reads(*imgs.shape[:-1])
     (
         left_of_brk_on_co_reads,
@@ -115,7 +113,6 @@ def make_cos(imgs: np.ndarray, colors: dict, co_type: str) -> np.ndarray:
     distal_on_co_reads = mask_locations_distal_to_crossovers(
         left_of_brk_on_co_reads, right_of_brk_on_co_reads
     )
-    print("Applying crossovers to images...")
     match co_type:
         case "reciprocal":
             imgs[right_of_brk_on_co_reads, :] = colors["p1"]
