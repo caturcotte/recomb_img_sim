@@ -1,5 +1,3 @@
-import numpy as np
-
 img_classes = (
     {"event": "co", "co_type": "p1"},
     {"event": "co", "co_type": "p2"},

@@ -3,16 +3,23 @@ import numpy as np
 from utils import *
 
 
-def mask_sequencing_errors(n_imgs, bin_length, read_depth, error_rate):
-    shape = (n_imgs, bin_length, read_depth)
+def filter_errors(
+    n_imgs: np.ndarray, bin_length: int, read_depth: int, error_rate: float
+) -> np.ndarray:
+    """Get locations of sequencing errors."""
     rng = np.random.default_rng()
-    p_error = rng.uniform(size=shape)
+    p_error = rng.uniform(size=(n_imgs, bin_length, read_depth))
     error_mask = p_error < error_rate
-    error_mask = repeat_array_to_dimensions(error_mask, shape)
     return error_mask
 
 
-def mask_errors_matching_parent(n_imgs, bin_length, read_depth, error_mask):
+def mask_errors_matching_parent(
+    n_imgs: np.ndarray,
+    bin_length: int,
+    read_depth: int,
+    error_mask: np.ndarray,
+) -> tuple:
+    """Determine which sequencing errors match one of the parents."""
     rng = np.random.default_rng()
     p_parent_match = rng.uniform(size=(n_imgs, bin_length, read_depth))
     p1_errors = error_mask & (p_parent_match < 0.25)
@@ -20,17 +27,6 @@ def mask_errors_matching_parent(n_imgs, bin_length, read_depth, error_mask):
     unique_errors = error_mask & (p_parent_match >= 0.5)
     return p1_errors, p2_errors, unique_errors
 
-
-def filter_errors(
-    n_imgs,
-    bin_length,
-    read_depth,
-    error_rate
-):
-    rng = np.random.default_rng()
-    p_error = rng.uniform(size=(n_imgs, bin_length, read_depth))
-    error_mask = p_error < error_rate
-    return error_mask
 
 def make_sequencing_errors(
     imgs: np.ndarray, colors: dict, error_rate: float

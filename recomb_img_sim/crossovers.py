@@ -10,21 +10,22 @@ def mask_breakpoint_to_end_of_read(
     """Filter for locations from the crossover to the end of the bin length.
 
     Args:
-        co_reads: A 4D bool array with the same shape as the image array
+        co_reads: A 3D bool array with the same shape as the image array
             (n_imgs, bin_length, read_depth, n_channels) that indicates which
             reads contain crossovers (arr[img, :, co_read, :] = True).
-        co_locations: A 4D int array of the same shape as the image array that
+        co_locations: A 3D int array of the same shape as the image array that
             lists the crossover location for each image
             (arr[img, co_site, :, :] = True).
 
     Returns:
-        left_of_brk_on_co_reads: 4D bool array that is True for locations left
+        left_of_brk_on_co_reads: 3D bool array that is True for locations left
             of the breakpoint on reads with a crossover.
-        right_of_brk_on_co_reads: 4D bool array that is True for locations
+        right_of_brk_on_co_reads: 3D bool array that is True for locations
             right of the breakpoint on reads with a crossover.
-        right_of_brk_on_other_reads: 4D bool array that is True for locations
-            right of the breakpoint on reads that do not have a crossover
-            (required to model reciprocal exchanges).
+        left_of_brk_on_co_reads: 3D bool array that is True for locations
+            left of the breakpoint on reads without a crossover.
+        right_of_brk_on_other_reads: 3D bool array that is True for locations
+            right of the breakpoint on reads that do not have a crossover.
     """
     n_imgs, bin_length, read_depth = co_reads.shape
     locations = make_location_array(n_imgs, bin_length, read_depth)
@@ -46,7 +47,7 @@ def mask_locations_distal_to_crossovers(
     left_breakpoint_mask: np.ndarray,
     right_breakpoint_mask: np.ndarray,
 ) -> np.ndarray:
-    """ Filter for locations distal to the crossover on the chromosome arm.
+    """Filter for locations distal to the crossover on the chromosome arm.
 
     Here distal has a 50% probability of being left of the crossover or right
     of the crossover, we just want to simulate both scenarios so that we can
@@ -61,14 +62,15 @@ def mask_locations_distal_to_crossovers(
     heterozygous on the left and homozygous on the right.
 
     Args:
-        left_breakpoint_mask: 4D bool array that is True for locations left of
-            the crossover on crossover-containing reads.
-        right_breakpoint_mask: 4D bool array that is True for locations right
-            of the crossover on crossover-containing reads.
+        left_breakpoint_mask (np.ndarray, dtype=bool): 3D array that is True
+            for locations left of the crossover on crossover-containing reads.
+        right_breakpoint_mask (np.ndarray, dtype=bool): 3D array that is
+            True for locations right of the crossover on crossover-containing
+            reads.
 
     Returns:
-        distal_mask: 4D bool array that is True for locations distal to the
-            crossover on crossover-containing reads.
+        distal_mask (np.ndarray, dtype=bool): 3D array that is True for
+            locations distal to the crossover on crossover-containing reads.
     """
     n_imgs, bin_length, read_depth = left_breakpoint_mask.shape
     rng = np.random.default_rng()
@@ -87,18 +89,18 @@ def make_cos(imgs: np.ndarray, colors: dict, co_type: str) -> np.ndarray:
     """Make crossovers in the image array.
 
     Args:
-        imgs: 4D int array of shape (n_imgs, bin_length, read_depth,
-            n_channels) containing colors for each pixel in every image for
-            this data class.
+        imgs (np.ndarray, dtype=int): 4D int array of shape (n_imgs,
+            bin_length, read_depth, n_channels) containing colors for
+            each pixel in every image for this data class.
         colors (dict[str: tuple]): The RGB values to use for each parent.
         co_type (str): Type of crossover to model (p1, p2 or reciprocal).
 
     Returns:
-        imgs: 4D array with crossovers modeled.
+        imgs (np.ndarray, dtype=int): 4D array with crossovers modeled.
 
     Raises:
-        ValueError: if co_type is not p1, p2 or reciprocal
-            (this should already be checked by the JSON schema anyway).
+        ValueError: if co_type is not p1, p2 or reciprocal.
+        (will add a JSON schema to check this at some point)
     """
     print("Getting crossover locations...")
     co_locations = get_breakpoint_locations(*imgs.shape[:-1])

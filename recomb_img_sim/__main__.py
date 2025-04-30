@@ -1,23 +1,33 @@
 #!/usr/bin/env python
 
-import numpy as np
 import json
+import numpy as np
 import os
 
 from PIL import Image
 
 from backcross import *
+from crossovers import *
 from full_tracts import *
 from img_classes import *
-from crossovers import *
 from noncrossovers import *
-from sequencing_errors import *
 from read_depth import *
 from read_length import *
+from sequencing_errors import *
 from utils import *
 
+"""Recombination image simulation.
 
-def process_img_class(imgs, img_cls, colors):
+This module takes parameters from config.json and uses them to generate
+images simulating recombination events of different types, as well as images
+where no recombination has occurred.
+"""
+
+
+def process_img_class(
+    imgs: np.ndarray, img_cls: dict, colors: dict
+) -> np.ndarray:
+    """Determine which simulation to run depending on the type of image."""
     match img_cls:
         case {"event": "co", "co_type": "p1" | "p2" | "reciprocal"}:
             imgs = make_cos(imgs, colors, img_cls["co_type"])
@@ -38,10 +48,9 @@ def process_img_class(imgs, img_cls, colors):
     return imgs
 
 
-def img_sim(empty_imgs, img_cls, config):
-    processed_imgs = process_img_class(
-        empty_imgs, img_cls, config["colors"]
-    )
+def img_sim(empty_imgs: np.ndarray, img_cls: dict, config: dict) -> np.ndarray:
+    """Process all of the images in a class."""
+    processed_imgs = process_img_class(empty_imgs, img_cls, config["colors"])
     imgs_with_backcross = make_backcross_reads(
         processed_imgs, config["colors"][config["backcross_parent"]]
     )
@@ -50,18 +59,21 @@ def img_sim(empty_imgs, img_cls, config):
     )
     imgs_shortened_reads = shorten_reads(
         imgs_with_errors,
-        config['colors']['missing_data'],
-        config['read_length_mean'],
-        config['read_length_stdev']
+        config["colors"]["missing_data"],
+        config["read_length_mean"],
+        config["read_length_stdev"],
     )
     imgs_with_reads_removed = remove_some_reads(
         imgs_shortened_reads,
         config["colors"]["missing_data"],
-        config['read_depth_mean'],
-        config['read_depth_stdev'] 
+        config["read_depth_mean"],
+        config["read_depth_stdev"],
     )
     return imgs_with_reads_removed
+
+
 def main():
+    """Run the simulation."""
     with open("config.json", "r") as file:
         config = json.load(file)
     output_dir = os.path.join(os.getcwd(), config["output_dir"])
@@ -73,7 +85,7 @@ def main():
             config["n_images_per_class"],
             config["bin_length"],
             config["read_depth"],
-            len(config['colors']['p1'])
+            len(config["colors"]["p1"]),
         )
         final_imgs = img_sim(empty_imgs, img_cls, config)
         print("Outputting final images...")
@@ -86,5 +98,7 @@ def main():
                     output_dir, img_cls_name, f"{img_cls_name}_{img}.png"
                 )
             )
+
+
 if __name__ == "__main__":
     main()

@@ -4,7 +4,7 @@ from utils import *
 
 
 def make_backcross_reads(
-    imgs: np.ndarray, backcross_parent_color: tuple
+    imgs: np.ndarray, backcross_parent_color: tuple[int]
 ) -> np.ndarray:
     """Add in reads from the backcross parent."""
     n_imgs, bin_length, read_depth = imgs.shape[:-1]
