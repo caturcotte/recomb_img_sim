@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import *
+from .utils import *
 
 
 def make_read_index_array(n_imgs, bin_length, read_depth):

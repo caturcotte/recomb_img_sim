@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import *
+from .utils import *
 
 
 def get_read_centers(n_imgs, read_depth, bin_length):

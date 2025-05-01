@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import csv
 import json
 import numpy as np
@@ -7,22 +5,15 @@ import os
 
 from PIL import Image
 
-from backcross import *
-from crossovers import *
-from full_tracts import *
-from img_classes import *
-from noncrossovers import *
-from read_depth import *
-from read_length import *
-from sequencing_errors import *
-from utils import *
-
-"""Recombination image simulation.
-
-This module takes parameters from config.json and uses them to generate
-images simulating recombination events of different types, as well as images
-where no recombination has occurred.
-"""
+from .backcross import *
+from .crossovers import *
+from .full_tracts import *
+from .img_classes import *
+from .noncrossovers import *
+from .read_depth import *
+from .read_length import *
+from .sequencing_errors import *
+from .utils import *
 
 
 def process_img_class(
@@ -73,9 +64,9 @@ def img_sim(empty_imgs: np.ndarray, img_cls: dict, config: dict) -> np.ndarray:
     return imgs_with_reads_removed
 
 
-def main():
+def run_img_sim(config_file: str):
     """Run the simulation."""
-    with open("config.json", "r") as file:
+    with open(config_file, "r") as file:
         config = json.load(file)
     output_dir = os.path.join(os.getcwd(), config["output_dir"])
     metadata = []
@@ -103,15 +94,9 @@ def main():
             png.save(out_file)
             metadata.append([img_cls_name, img, out_file])
     print("Writing metadata...")
-    with open(
-        os.path.join(output_dir, 'metadata.csv'), 'w'
-    ) as csvfile:
+    with open(os.path.join(output_dir, "metadata.csv"), "w") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["img_class", "img", "path"])
         for line in metadata:
             writer.writerow(line)
-
-
-if __name__ == "__main__":
-    main()
     print("Done!")

@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import *
+from .utils import *
 
 
 def mask_nco_site(

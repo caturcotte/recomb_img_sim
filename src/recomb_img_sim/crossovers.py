@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import *
+from .utils import *
 
 
 def mask_breakpoint_to_end_of_read(

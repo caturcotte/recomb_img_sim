@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import *
+from .utils import *
 
 
 def make_backcross_reads(

@@ -7,9 +7,7 @@ name = "recomb_img_sim"
 version = "1.0.0"
 dependencies = ["numpy", "pillow"]
 requires-python = ">=3.10"
+readme = "README.md"
 
 [project.scripts]
-imgsim = "recomb_img_sim.__main__:main"
-
-[tool.setuptools.packages.find]
-where = ["."]
+imgsim = "recomb_img_sim.cli:cli"
