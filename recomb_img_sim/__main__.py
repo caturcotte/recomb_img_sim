@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import csv
 import json
 import numpy as np
 import os
@@ -77,6 +78,7 @@ def main():
     with open("config.json", "r") as file:
         config = json.load(file)
     output_dir = os.path.join(os.getcwd(), config["output_dir"])
+    metadata = []
     for img_cls in img_classes:
         img_cls_name = "_".join(list(img_cls.values()))
         print(f"Processing class {img_cls_name}...")
@@ -92,13 +94,24 @@ def main():
         final_imgs = final_imgs.astype(np.uint8)
         for img in range(config["n_images_per_class"]):
             png = Image.fromarray(final_imgs[img])
-            png.save(
-                os.path.join(
-                    output_dir, img_cls_name, f"{img_cls_name}_{img}.png"
-                )
+            out_file = os.path.join(
+                os.getcwd(),
+                output_dir,
+                img_cls_name,
+                f"{img_cls_name}_{img}.png",
             )
-        print("Done!")
+            png.save(out_file)
+            metadata.append([img_cls_name, img, out_file])
+    print("Writing metadata...")
+    with open(
+        os.path.join(output_dir, 'metadata.csv'), 'w'
+    ) as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["img_class", "img", "path"])
+        for line in metadata:
+            writer.writerow(line)
 
 
 if __name__ == "__main__":
     main()
+    print("Done!")
