@@ -1,5 +1,4 @@
 import csv
-import itertools
 import json
 import numpy as np
 import os
@@ -80,14 +79,15 @@ def save_image_get_path(imgs, img_cls_name, img, out_dir):
 
 
 def save_images_and_metadata(
-    all_imgs: dict, img_cls_names: list, n_imgs: int, out_dir: str
+    all_imgs: dict, img_cls_names: list, n_imgs_per_cls, out_dir: str
 ):
     """Save images and return their metadata."""
-    for img_cls, img_number in itertools.product(img_cls_names, range(n_imgs)):
-        out_file = save_image_get_path(
-            all_imgs[img_cls], img_cls, img_number, out_dir
-        )
-        yield [img_cls, img_number, out_file]
+    for img_cls in img_cls_names:
+        for img_number in range(n_imgs_per_cls[img_cls]):
+            out_file = save_image_get_path(
+                all_imgs[img_cls], img_cls, img_number, out_dir
+            )
+            yield [img_cls, img_number, out_file]
 
 
 def run_img_sim(config_file: str):
@@ -100,11 +100,12 @@ def run_img_sim(config_file: str):
     img_cls_names = ["_".join(list(i.values())) for i in img_classes]
     img_cls_imgs = {}
     for img_cls, img_cls_name in zip(img_classes, img_cls_names):
+        n_imgs = config["n_images_per_class"][img_cls_name]
         tstamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{tstamp}] Processing class {img_cls_name}...")
         os.makedirs(os.path.join(output_dir, img_cls_name), exist_ok=True)
         empty_imgs = make_img_array(
-            config["n_images_per_class"],
+            n_imgs,
             config["bin_length"],
             config["read_depth"],
             len(config["colors"]["p1"]),

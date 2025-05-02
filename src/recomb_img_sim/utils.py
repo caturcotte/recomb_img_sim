@@ -1,6 +1,7 @@
 import numpy as np
 import time
 
+
 def benchmark(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -8,13 +9,19 @@ def benchmark(func):
         end_time = time.time()
         print(f"Runtime: {end_time - start_time:.2f}s")
         return result
+
     return wrapper
 
 
 def print_parameters(config):
     print("--------------------------")
     for p in config:
-        print(f"{p}: {config[p]}")
+        if isinstance(config[p], dict):
+            print(f"{p}:")
+            for i in config[p]:
+                print(f"\t{i}: {config[p][i]}")
+        else:
+            print(f"{p}: {config[p]}")
     print("--------------------------")
 
 

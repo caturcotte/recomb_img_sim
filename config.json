@@ -1,6 +1,17 @@
 {
     "output_dir": "output/",
-    "n_images_per_class": 50,
+    "n_images_per_class": {
+        "heterozygous": 50,
+        "co_p1": 5,
+        "co_p2": 5,
+        "co_reciprocal": 2,
+        "homozygous_p1": 20, 
+        "homozygous_p2": 20, 
+        "nco_p1_homozygous": 1,
+        "nco_p2_homozygous": 1,
+        "nco_p1_heterozygous": 2,
+        "nco_p2_heterozygous": 2
+    },
     "bin_length": 64,
     "read_depth": 64,
     "error_rate": 0,
