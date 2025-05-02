@@ -1,4 +1,21 @@
 import numpy as np
+import time
+
+def benchmark(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"Runtime: {end_time - start_time:.2f}s")
+        return result
+    return wrapper
+
+
+def print_parameters(config):
+    print("--------------------------")
+    for p in config:
+        print(f"{p}: {config[p]}")
+    print("--------------------------")
 
 
 def repeat_array_to_dimensions(a, dimensions):

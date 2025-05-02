@@ -1,12 +1,14 @@
 import argparse
 
 from .run_sim import run_img_sim
+from .utils import benchmark
 
 
+@benchmark
 def cli():
     """Run the simulation on the command line."""
     parser = argparse.ArgumentParser(
-        prog="recomb_img_sim",
+        prog="imgsim",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""\
             Recombination image simulation.

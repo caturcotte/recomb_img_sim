@@ -1,8 +1,10 @@
 import csv
+import itertools
 import json
 import numpy as np
 import os
 
+from datetime import datetime
 from PIL import Image
 
 from .backcross import *
@@ -61,18 +63,45 @@ def img_sim(empty_imgs: np.ndarray, img_cls: dict, config: dict) -> np.ndarray:
         config["read_depth_mean"],
         config["read_depth_stdev"],
     )
-    return imgs_with_reads_removed
+    final_imgs = np.moveaxis(imgs_with_reads_removed, 1, 2).astype(np.uint8)
+    return final_imgs
+
+
+def save_image_get_path(imgs, img_cls_name, img, out_dir):
+    """Save image as file and return file name."""
+    png = Image.fromarray(imgs[img])
+    out_file = os.path.join(
+        out_dir,
+        img_cls_name,
+        f"{img_cls_name}_{img}.png",
+    )
+    png.save(out_file)
+    return out_file
+
+
+def save_images_and_metadata(
+    all_imgs: dict, img_cls_names: list, n_imgs: int, out_dir: str
+):
+    """Save images and return their metadata."""
+    for img_cls, img_number in itertools.product(img_cls_names, range(n_imgs)):
+        out_file = save_image_get_path(
+            all_imgs[img_cls], img_cls, img_number, out_dir
+        )
+        yield [img_cls, img_number, out_file]
 
 
 def run_img_sim(config_file: str):
     """Run the simulation."""
+    print("RECOMBINATION IMAGE SIMULATION")
     with open(config_file, "r") as file:
         config = json.load(file)
+    print_parameters(config)
     output_dir = os.path.join(os.getcwd(), config["output_dir"])
-    metadata = []
-    for img_cls in img_classes:
-        img_cls_name = "_".join(list(img_cls.values()))
-        print(f"Processing class {img_cls_name}...")
+    img_cls_names = ["_".join(list(i.values())) for i in img_classes]
+    img_cls_imgs = {}
+    for img_cls, img_cls_name in zip(img_classes, img_cls_names):
+        tstamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{tstamp}] Processing class {img_cls_name}...")
         os.makedirs(os.path.join(output_dir, img_cls_name), exist_ok=True)
         empty_imgs = make_img_array(
             config["n_images_per_class"],
@@ -81,22 +110,19 @@ def run_img_sim(config_file: str):
             len(config["colors"]["p1"]),
         )
         final_imgs = img_sim(empty_imgs, img_cls, config)
-        final_imgs = np.moveaxis(final_imgs, 1, 2)
-        final_imgs = final_imgs.astype(np.uint8)
-        for img in range(config["n_images_per_class"]):
-            png = Image.fromarray(final_imgs[img])
-            out_file = os.path.join(
-                os.getcwd(),
-                output_dir,
-                img_cls_name,
-                f"{img_cls_name}_{img}.png",
-            )
-            png.save(out_file)
-            metadata.append([img_cls_name, img, out_file])
-    print("Writing metadata...")
+        img_cls_imgs[img_cls_name] = final_imgs
+    tstamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{tstamp}] Saving images and writing metadata...")
     with open(os.path.join(output_dir, "metadata.csv"), "w") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["img_class", "img", "path"])
-        for line in metadata:
+        img_and_metadata_generator = save_images_and_metadata(
+            img_cls_imgs,
+            img_cls_names,
+            config["n_images_per_class"],
+            output_dir,
+        )
+        for line in img_and_metadata_generator:
             writer.writerow(line)
-    print("Done!")
+    tstamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{tstamp}] Done!")
